@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Shorts Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e1e5e9;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-text {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            background: #fdf2f2;
+            border: 1px solid #fecaca;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .success-message {
+            color: #059669;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .results-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            margin-top: 15px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            margin-top: 10px;
+        }
+
+        .features {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .features h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li i {
+            color: #667eea;
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .ollama-notice {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .ollama-notice h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .ollama-notice p {
+            color: #78350f;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .ollama-notice ol {
+            color: #78350f;
+            margin-left: 20px;
+        }
+
+        .ollama-notice li {
+            margin-bottom: 5px;
+        }
+
+        .ollama-notice code {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .ollama-notice a {
+            color: #d97706;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .ollama-notice a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-video"></i> YouTube Shorts Generator</h1>
+            <p>Transform any YouTube video into engaging short-form content automatically</p>
+        </div>
+
+        <form id="processForm">
+            <div class="form-group">
+                <label for="youtube_url">
+                    <i class="fab fa-youtube"></i> YouTube URL
+                </label>
+                <input type="url" id="youtube_url" name="youtube_url" 
+                       placeholder="https://www.youtube.com/watch?v=..." required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="top_n">
+                        <i class="fas fa-chart-line"></i> Top Keywords
+                    </label>
+                    <select id="top_n" name="top_n">
+                        <option value="3">3 Keywords</option>
+                        <option value="5" selected>5 Keywords</option>
+                        <option value="7">7 Keywords</option>
+                        <option value="10">10 Keywords</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="time_range">
+                        <i class="fas fa-clock"></i> Time Range (seconds)
+                    </label>
+                    <select id="time_range" name="time_range">
+                        <option value="10">10 seconds</option>
+                        <option value="15" selected>15 seconds</option>
+                        <option value="20">20 seconds</option>
+                        <option value="30">30 seconds</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn" id="processBtn">
+                <i class="fas fa-magic"></i> Generate Shorts
+            </button>
+        </form>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="status-text" id="statusText">Initializing...</div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="results-section" id="resultsSection">
+            <h3><i class="fas fa-check-circle"></i> Processing Complete!</h3>
+            <p>Your YouTube shorts have been generated successfully.</p>
+            <button class="btn results-btn" onclick="viewResults()">
+                <i class="fas fa-eye"></i> View Results
+            </button>
+            <button class="btn download-btn" onclick="downloadResults()">
+                <i class="fas fa-download"></i> Download All Clips
+            </button>
+        </div>
+
+        <div class="features">
+            <h3><i class="fas fa-star"></i> What This Tool Does</h3>
+            <ul class="feature-list">
+                <li><i class="fas fa-caption"></i> Extracts captions from YouTube videos</li>
+                <li><i class="fas fa-chart-bar"></i> Analyzes trending keywords and topics</li>
+                <li><i class="fas fa-cut"></i> Creates video clips around key moments</li>
+                <li><i class="fas fa-crop"></i> Reframes videos to 9:16 aspect ratio</li>
+                <li><i class="fas fa-closed-captioning"></i> Adds animated captions to clips</li>
+                <li><i class="fas fa-tags"></i> Generates SEO-optimized titles and metadata</li>
+            </ul>
+        </div>
+
+        {% if not ollama_available %}
+        <div class="ollama-notice">
+            <h3><i class="fas fa-info-circle"></i> Ollama Notice</h3>
+            <p>Advanced metadata generation requires Ollama with Qwen2.5:3B model. 
+            The tool will still work for video processing, but will use basic metadata generation.</p>
+            <p><strong>To enable full features:</strong></p>
+            <ol>
+                <li>Install Ollama from <a href="https://ollama.ai" target="_blank">https://ollama.ai</a></li>
+                <li>Start Ollama: <code>ollama serve</code></li>
+                <li>Install the model: <code>ollama pull qwen2.5:3b</code></li>
+            </ol>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        let statusInterval;
+
+        document.getElementById('processForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                youtube_url: formData.get('youtube_url'),
+                top_n: parseInt(formData.get('top_n')),
+                time_range: parseInt(formData.get('time_range'))
+            };
+
+            // Show progress container
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            
+            // Disable form
+            document.getElementById('processBtn').disabled = true;
+            document.getElementById('processBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Start polling for status
+                    startStatusPolling();
+                } else {
+                    showError(result.error || 'Failed to start processing');
+                    resetForm();
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+                resetForm();
+            }
+        });
+
+        function startStatusPolling() {
+            statusInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/status');
+                    const status = await response.json();
+
+                    updateProgress(status.progress, status.current_step);
+
+                    if (status.error) {
+                        showError(status.error);
+                        resetForm();
+                        clearInterval(statusInterval);
+                    } else if (!status.is_processing && status.progress === 100) {
+                        showSuccess(status.message || 'Processing completed successfully!');
+                        document.getElementById('resultsSection').style.display = 'block';
+                        resetForm();
+                        clearInterval(statusInterval);
+                    }
+                } catch (error) {
+                    console.error('Error polling status:', error);
+                }
+            }, 1000);
+        }
+
+        function updateProgress(progress, step) {
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('statusText').textContent = step || 'Processing...';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        function resetForm() {
+            document.getElementById('processBtn').disabled = false;
+            document.getElementById('processBtn').innerHTML = '<i class="fas fa-magic"></i> Generate Shorts';
+            document.getElementById('progressContainer').style.display = 'none';
+        }
+
+        function viewResults() {
+            window.open('/results', '_blank');
+        }
+
+        function downloadResults() {
+            window.location.href = '/download';
+        }
+    </script>
+</body>
+</html> 
